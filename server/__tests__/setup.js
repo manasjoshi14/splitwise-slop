@@ -1,7 +1,5 @@
 const { Pool } = require('pg');
 const jwt = require('jsonwebtoken');
-const fs = require('fs');
-const path = require('path');
 
 const TEST_DB_URL = 'postgresql://postgres@localhost:5432/splitwise_test';
 const JWT_SECRET = 'test-jwt-secret';
@@ -16,11 +14,6 @@ process.env.CLIENT_URL = 'http://localhost:5173';
 const pool = new Pool({ connectionString: TEST_DB_URL });
 
 async function setupDatabase() {
-  const schema = fs.readFileSync(
-    path.join(__dirname, '../db/migrate.js'),
-    'utf8'
-  );
-
   // Run migration SQL directly
   await pool.query(`
     CREATE TABLE IF NOT EXISTS users (

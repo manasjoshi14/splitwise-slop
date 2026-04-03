@@ -73,7 +73,7 @@ splitwise-slop/
 
 ### Prerequisites
 
-- Node.js 18+
+- [Bun](https://bun.sh) 1.0+ (or Node.js 18+)
 - PostgreSQL 16+ running locally
 - Google OAuth credentials from [Google Cloud Console](https://console.cloud.google.com/apis/credentials)
 
@@ -83,8 +83,8 @@ splitwise-slop/
 
 ```bash
 git clone <repo-url> && cd splitwise-slop
-cd client && npm install
-cd ../server && npm install
+cd client && bun install
+cd ../server && bun install
 ```
 
 2. **Configure environment variables:**
@@ -108,17 +108,17 @@ PORT=3001
 
 ```bash
 createdb splitwise_dev
-cd server && npm run migrate
+cd server && bun run migrate
 ```
 
 4. **Start development servers:**
 
 ```bash
 # Terminal 1 - Backend (with auto-reload)
-cd server && npm run dev
+cd server && bun run dev
 
 # Terminal 2 - Frontend (with HMR)
-cd client && npm run dev
+cd client && bun run dev
 ```
 
 The frontend runs on `http://localhost:5173` and proxies `/api` and `/auth` requests to the backend on port 3001.
@@ -148,22 +148,22 @@ The project uses **ESLint** for linting and **Prettier** for formatting. A share
 ```bash
 # Client
 cd client
-npm run lint          # ESLint check
-npm run format:check  # Prettier check (no changes)
-npm run format        # Prettier auto-fix
+bun run lint          # ESLint check
+bun run format:check  # Prettier check (no changes)
+bun run format        # Prettier auto-fix
 
 # Server
 cd server
-npm run lint          # ESLint check
-npm run format:check  # Prettier check (no changes)
-npm run format        # Prettier auto-fix
+bun run lint          # ESLint check
+bun run format:check  # Prettier check (no changes)
+bun run format        # Prettier auto-fix
 ```
 
 All lint and format checks must pass before committing. Run both to verify:
 
 ```bash
-cd client && npm run lint && npm run format:check
-cd ../server && npm run lint && npm run format:check
+cd client && bun run lint && bun run format:check
+cd ../server && bun run lint && bun run format:check
 ```
 
 ### Architecture Notes
@@ -181,15 +181,15 @@ cd ../server && npm run lint && npm run format:check
 
 | Layer | Framework | Runner | Coverage |
 |-------|-----------|--------|----------|
-| **Server** | Jest + Supertest | `npm test` | v8 via Jest |
-| **Client** | Vitest + React Testing Library | `npm test` | v8 via Vitest |
+| **Server** | Jest + Supertest | `bun test` | v8 via Jest |
+| **Client** | Vitest + React Testing Library | `bun test` | v8 via Vitest |
 
 ### Running Tests
 
 ```bash
 # Server tests (requires PostgreSQL running locally)
 cd server
-npm test
+bun test
 ```
 
 Server tests use a real PostgreSQL database (`splitwise_test`). The test setup (`__tests__/setup.js`) automatically:
@@ -201,14 +201,14 @@ Server tests use a real PostgreSQL database (`splitwise_test`). The test setup (
 ```bash
 # Client tests (no external dependencies)
 cd client
-npm test
+bun test
 ```
 
 Client tests run in jsdom with all API calls mocked. No running server or database needed.
 
 ### Test Coverage
 
-Both projects are configured to output coverage reports when running `npm test`.
+Both projects are configured to output coverage reports when running `bun test`.
 
 **Coverage targets: >= 60% line coverage for both client and server.**
 
@@ -293,23 +293,23 @@ Before submitting changes, run through this checklist:
 
 ```bash
 # 1. Lint both projects
-cd client && npm run lint && cd ../server && npm run lint
+cd client && bun run lint && cd ../server && bun run lint
 
 # 2. Format check both projects
-cd client && npm run format:check && cd ../server && npm run format:check
+cd client && bun run format:check && cd ../server && bun run format:check
 
 # 3. Run server tests (requires PostgreSQL)
-cd server && npm test
+cd server && bun test
 
 # 4. Run client tests
-cd client && npm test
+cd client && bun test
 
 # 5. Verify the frontend builds without errors
-cd client && npm run build
+cd client && bun run build
 
 # 6. Manual smoke test
-cd server && npm run dev &     # Start backend
-cd client && npm run dev &     # Start frontend
+cd server && bun run dev &     # Start backend
+cd client && bun run dev &     # Start frontend
 # Visit http://localhost:5173 and verify:
 #   - Login page loads with Google sign-in button
 #   - After auth: dashboard shows balances

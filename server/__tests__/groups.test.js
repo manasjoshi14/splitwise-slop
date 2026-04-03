@@ -9,7 +9,7 @@ const {
 
 let app;
 let users;
-let aliceToken, bobToken;
+let aliceToken;
 
 beforeAll(async () => {
   await setupDatabase();
@@ -20,7 +20,6 @@ beforeEach(async () => {
   await cleanDatabase();
   users = await seedUsers();
   aliceToken = generateToken(users[0]);
-  bobToken = generateToken(users[1]);
 });
 
 afterAll(async () => {
