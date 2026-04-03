@@ -1,13 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
 import api from '../api';
 import AddExpenseModal from '../components/AddExpenseModal';
 import SettleUpModal from '../components/SettleUpModal';
 
 export default function GroupDetail() {
   const { id } = useParams();
-  const { user } = useAuth();
   const [group, setGroup] = useState(null);
   const [expenses, setExpenses] = useState([]);
   const [balances, setBalances] = useState([]);
@@ -17,13 +15,15 @@ export default function GroupDetail() {
   const [showAddMember, setShowAddMember] = useState(false);
   const [tab, setTab] = useState('expenses');
 
-  const fetchAll = () => {
-    api.get(`/api/groups/${id}`).then(res => setGroup(res.data));
-    api.get(`/api/expenses/group/${id}`).then(res => setExpenses(res.data));
-    api.get(`/api/balances/group/${id}`).then(res => setBalances(res.data));
-  };
+  const fetchAll = useCallback(() => {
+    api.get(`/api/groups/${id}`).then((res) => setGroup(res.data));
+    api.get(`/api/expenses/group/${id}`).then((res) => setExpenses(res.data));
+    api.get(`/api/balances/group/${id}`).then((res) => setBalances(res.data));
+  }, [id]);
 
-  useEffect(() => { fetchAll(); }, [id]);
+  useEffect(() => {
+    fetchAll();
+  }, [fetchAll]);
 
   const handleAddMember = async (e) => {
     e.preventDefault();
@@ -37,16 +37,19 @@ export default function GroupDetail() {
     }
   };
 
-  if (!group) return <div className="p-4 text-center text-gray-500">Loading...</div>;
+  if (!group)
+    return <div className="p-4 text-center text-gray-500">Loading...</div>;
 
   return (
     <div className="p-4 pb-20">
       <h1 className="text-2xl font-bold mb-1">{group.name}</h1>
-      <p className="text-sm text-gray-500 mb-4">{group.members?.length} members</p>
+      <p className="text-sm text-gray-500 mb-4">
+        {group.members?.length} members
+      </p>
 
       {/* Tab switcher */}
       <div className="flex gap-1 bg-gray-100 rounded-lg p-1 mb-4">
-        {['expenses', 'balances', 'members'].map(t => (
+        {['expenses', 'balances', 'members'].map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
@@ -71,7 +74,7 @@ export default function GroupDetail() {
             <p className="text-gray-500 text-center py-8">No expenses yet.</p>
           ) : (
             <div className="space-y-2">
-              {expenses.map(e => (
+              {expenses.map((e) => (
                 <div key={e.id} className="bg-white rounded-xl p-4 shadow-sm">
                   <div className="flex justify-between items-start">
                     <div>
@@ -81,7 +84,9 @@ export default function GroupDetail() {
                       </p>
                     </div>
                     <div className="text-right">
-                      <p className="font-semibold">${parseFloat(e.amount).toFixed(2)}</p>
+                      <p className="font-semibold">
+                        ${parseFloat(e.amount).toFixed(2)}
+                      </p>
                       <p className="text-xs text-gray-400">
                         {new Date(e.created_at).toLocaleDateString()}
                       </p>
@@ -99,17 +104,25 @@ export default function GroupDetail() {
           {balances.length === 0 ? (
             <p className="text-gray-500 text-center py-8">All settled up!</p>
           ) : (
-            balances.map(b => (
-              <div key={b.user_id} className="bg-white rounded-xl p-4 shadow-sm flex items-center justify-between">
+            balances.map((b) => (
+              <div
+                key={b.user_id}
+                className="bg-white rounded-xl p-4 shadow-sm flex items-center justify-between"
+              >
                 <div className="flex items-center gap-3">
                   <img
-                    src={b.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(b.name)}&background=random`}
+                    src={
+                      b.avatar_url ||
+                      `https://ui-avatars.com/api/?name=${encodeURIComponent(b.name)}&background=random`
+                    }
                     alt={b.name}
                     className="w-10 h-10 rounded-full"
                   />
                   <div>
                     <p className="font-medium">{b.name}</p>
-                    <p className={`text-sm ${parseFloat(b.balance) > 0 ? 'text-green-600' : 'text-orange-600'}`}>
+                    <p
+                      className={`text-sm ${parseFloat(b.balance) > 0 ? 'text-green-600' : 'text-orange-600'}`}
+                    >
                       {parseFloat(b.balance) > 0
                         ? `owes you $${parseFloat(b.balance).toFixed(2)}`
                         : `you owe $${Math.abs(parseFloat(b.balance)).toFixed(2)}`}
@@ -139,23 +152,37 @@ export default function GroupDetail() {
             + Add Member
           </button>
           {showAddMember && (
-            <form onSubmit={handleAddMember} className="bg-white rounded-xl p-4 shadow-sm mb-4 flex gap-2">
+            <form
+              onSubmit={handleAddMember}
+              className="bg-white rounded-xl p-4 shadow-sm mb-4 flex gap-2"
+            >
               <input
                 type="email"
                 value={addMemberEmail}
-                onChange={e => setAddMemberEmail(e.target.value)}
+                onChange={(e) => setAddMemberEmail(e.target.value)}
                 placeholder="Email address"
                 required
                 className="flex-1 border border-gray-300 rounded-lg px-3 py-2"
               />
-              <button type="submit" className="bg-teal-600 text-white px-4 py-2 rounded-lg">Add</button>
+              <button
+                type="submit"
+                className="bg-teal-600 text-white px-4 py-2 rounded-lg"
+              >
+                Add
+              </button>
             </form>
           )}
           <div className="space-y-2">
-            {group.members?.map(m => (
-              <div key={m.id} className="bg-white rounded-xl p-4 shadow-sm flex items-center gap-3">
+            {group.members?.map((m) => (
+              <div
+                key={m.id}
+                className="bg-white rounded-xl p-4 shadow-sm flex items-center gap-3"
+              >
                 <img
-                  src={m.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(m.name)}&background=random`}
+                  src={
+                    m.avatar_url ||
+                    `https://ui-avatars.com/api/?name=${encodeURIComponent(m.name)}&background=random`
+                  }
                   alt={m.name}
                   className="w-10 h-10 rounded-full"
                 />

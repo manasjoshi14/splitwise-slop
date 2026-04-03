@@ -2,7 +2,13 @@ import { useState, useEffect } from 'react';
 import api from '../api';
 import { useAuth } from '../context/AuthContext';
 
-export default function AddExpenseModal({ groupId, members, friendId, onClose, onAdded }) {
+export default function AddExpenseModal({
+  groupId,
+  members,
+  friendId,
+  onClose,
+  onAdded,
+}) {
   const { user } = useAuth();
   const [description, setDescription] = useState('');
   const [amount, setAmount] = useState('');
@@ -14,7 +20,7 @@ export default function AddExpenseModal({ groupId, members, friendId, onClose, o
 
   useEffect(() => {
     if (members) {
-      setParticipants(members.map(m => m.id));
+      setParticipants(members.map((m) => m.id));
     } else if (friendId) {
       setParticipants([user.id, friendId]);
     }
@@ -24,9 +30,13 @@ export default function AddExpenseModal({ groupId, members, friendId, onClose, o
     e.preventDefault();
     setSubmitting(true);
     try {
-      const splits = splitType === 'exact'
-        ? participants.map(id => ({ user_id: id, amount: parseFloat(exactAmounts[id] || 0) }))
-        : participants.map(id => ({ user_id: id }));
+      const splits =
+        splitType === 'exact'
+          ? participants.map((id) => ({
+              user_id: id,
+              amount: parseFloat(exactAmounts[id] || 0),
+            }))
+          : participants.map((id) => ({ user_id: id }));
 
       await api.post('/api/expenses', {
         group_id: groupId || null,
@@ -51,8 +61,8 @@ export default function AddExpenseModal({ groupId, members, friendId, onClose, o
   ];
 
   const toggleParticipant = (id) => {
-    setParticipants(prev =>
-      prev.includes(id) ? prev.filter(p => p !== id) : [...prev, id]
+    setParticipants((prev) =>
+      prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id]
     );
   };
 
@@ -61,7 +71,12 @@ export default function AddExpenseModal({ groupId, members, friendId, onClose, o
       <div className="bg-white w-full max-w-md rounded-t-2xl sm:rounded-2xl p-6 max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold">Add Expense</h2>
-          <button onClick={onClose} className="text-gray-400 text-2xl leading-none">&times;</button>
+          <button
+            onClick={onClose}
+            className="text-gray-400 text-2xl leading-none"
+          >
+            &times;
+          </button>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -69,7 +84,7 @@ export default function AddExpenseModal({ groupId, members, friendId, onClose, o
             type="text"
             placeholder="Description (e.g. Dinner)"
             value={description}
-            onChange={e => setDescription(e.target.value)}
+            onChange={(e) => setDescription(e.target.value)}
             required
             className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500"
           />
@@ -78,7 +93,7 @@ export default function AddExpenseModal({ groupId, members, friendId, onClose, o
             type="number"
             placeholder="Amount"
             value={amount}
-            onChange={e => setAmount(e.target.value)}
+            onChange={(e) => setAmount(e.target.value)}
             required
             step="0.01"
             min="0.01"
@@ -89,10 +104,10 @@ export default function AddExpenseModal({ groupId, members, friendId, onClose, o
             <label className="text-sm text-gray-600 block mb-1">Paid by</label>
             <select
               value={paidBy}
-              onChange={e => setPaidBy(parseInt(e.target.value))}
+              onChange={(e) => setPaidBy(parseInt(e.target.value))}
               className="w-full border border-gray-300 rounded-lg px-3 py-2"
             >
-              {availableUsers.map(u => (
+              {availableUsers.map((u) => (
                 <option key={u.id} value={u.id}>
                   {u.id === user.id ? 'You' : u.name}
                 </option>
@@ -101,13 +116,17 @@ export default function AddExpenseModal({ groupId, members, friendId, onClose, o
           </div>
 
           <div>
-            <label className="text-sm text-gray-600 block mb-1">Split type</label>
+            <label className="text-sm text-gray-600 block mb-1">
+              Split type
+            </label>
             <div className="flex gap-2">
               <button
                 type="button"
                 onClick={() => setSplitType('equal')}
                 className={`flex-1 py-2 rounded-lg text-sm font-medium ${
-                  splitType === 'equal' ? 'bg-teal-600 text-white' : 'bg-gray-100 text-gray-700'
+                  splitType === 'equal'
+                    ? 'bg-teal-600 text-white'
+                    : 'bg-gray-100 text-gray-700'
                 }`}
               >
                 Equal
@@ -116,7 +135,9 @@ export default function AddExpenseModal({ groupId, members, friendId, onClose, o
                 type="button"
                 onClick={() => setSplitType('exact')}
                 className={`flex-1 py-2 rounded-lg text-sm font-medium ${
-                  splitType === 'exact' ? 'bg-teal-600 text-white' : 'bg-gray-100 text-gray-700'
+                  splitType === 'exact'
+                    ? 'bg-teal-600 text-white'
+                    : 'bg-gray-100 text-gray-700'
                 }`}
               >
                 Exact amounts
@@ -126,9 +147,11 @@ export default function AddExpenseModal({ groupId, members, friendId, onClose, o
 
           {members && (
             <div>
-              <label className="text-sm text-gray-600 block mb-1">Split between</label>
+              <label className="text-sm text-gray-600 block mb-1">
+                Split between
+              </label>
               <div className="space-y-2">
-                {availableUsers.map(u => (
+                {availableUsers.map((u) => (
                   <div key={u.id} className="flex items-center gap-2">
                     <input
                       type="checkbox"
@@ -136,13 +159,20 @@ export default function AddExpenseModal({ groupId, members, friendId, onClose, o
                       onChange={() => toggleParticipant(u.id)}
                       className="rounded"
                     />
-                    <span className="text-sm flex-1">{u.id === user.id ? 'You' : u.name}</span>
+                    <span className="text-sm flex-1">
+                      {u.id === user.id ? 'You' : u.name}
+                    </span>
                     {splitType === 'exact' && participants.includes(u.id) && (
                       <input
                         type="number"
                         step="0.01"
                         value={exactAmounts[u.id] || ''}
-                        onChange={e => setExactAmounts(prev => ({ ...prev, [u.id]: e.target.value }))}
+                        onChange={(e) =>
+                          setExactAmounts((prev) => ({
+                            ...prev,
+                            [u.id]: e.target.value,
+                          }))
+                        }
                         placeholder="0.00"
                         className="w-24 border border-gray-300 rounded px-2 py-1 text-sm"
                       />
@@ -155,7 +185,8 @@ export default function AddExpenseModal({ groupId, members, friendId, onClose, o
 
           {splitType === 'equal' && amount && participants.length > 0 && (
             <p className="text-sm text-gray-500">
-              ${(parseFloat(amount) / participants.length).toFixed(2)} per person
+              ${(parseFloat(amount) / participants.length).toFixed(2)} per
+              person
             </p>
           )}
 

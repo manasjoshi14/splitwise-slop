@@ -53,7 +53,15 @@ router.get('/between/:userId', async (req, res) => {
 
 // Create expense
 router.post('/', async (req, res) => {
-  const { group_id, description, amount, currency, paid_by, split_type, splits } = req.body;
+  const {
+    group_id,
+    description,
+    amount,
+    currency,
+    paid_by,
+    split_type,
+    splits,
+  } = req.body;
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
@@ -61,7 +69,15 @@ router.post('/', async (req, res) => {
     const { rows } = await client.query(
       `INSERT INTO expenses (group_id, description, amount, currency, paid_by, split_type, created_by)
        VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
-      [group_id || null, description, amount, currency || 'USD', paid_by, split_type || 'equal', req.user.id]
+      [
+        group_id || null,
+        description,
+        amount,
+        currency || 'USD',
+        paid_by,
+        split_type || 'equal',
+        req.user.id,
+      ]
     );
     const expense = rows[0];
 
@@ -77,18 +93,21 @@ router.post('/', async (req, res) => {
       // Equal split - get participants
       let participants;
       if (splits && splits.length) {
-        participants = splits.map(s => s.user_id);
+        participants = splits.map((s) => s.user_id);
       } else if (group_id) {
         const memberRes = await client.query(
           'SELECT user_id FROM group_members WHERE group_id = $1',
           [group_id]
         );
-        participants = memberRes.rows.map(r => r.user_id);
+        participants = memberRes.rows.map((r) => r.user_id);
       } else {
-        participants = [req.user.id, paid_by].filter((v, i, a) => a.indexOf(v) === i);
+        participants = [req.user.id, paid_by].filter(
+          (v, i, a) => a.indexOf(v) === i
+        );
       }
 
-      const splitAmount = Math.round((amount / participants.length) * 100) / 100;
+      const splitAmount =
+        Math.round((amount / participants.length) * 100) / 100;
       for (const userId of participants) {
         await client.query(
           'INSERT INTO expense_splits (expense_id, user_id, amount) VALUES ($1, $2, $3)',
@@ -109,7 +128,8 @@ router.post('/', async (req, res) => {
 
 // Update expense
 router.put('/:id', async (req, res) => {
-  const { description, amount, currency, paid_by, split_type, splits } = req.body;
+  const { description, amount, currency, paid_by, split_type, splits } =
+    req.body;
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
@@ -117,7 +137,14 @@ router.put('/:id', async (req, res) => {
     const { rows } = await client.query(
       `UPDATE expenses SET description = $1, amount = $2, currency = COALESCE($3, currency),
        paid_by = $4, split_type = $5 WHERE id = $6 RETURNING *`,
-      [description, amount, currency, paid_by, split_type || 'equal', req.params.id]
+      [
+        description,
+        amount,
+        currency,
+        paid_by,
+        split_type || 'equal',
+        req.params.id,
+      ]
     );
     if (!rows.length) {
       await client.query('ROLLBACK');
@@ -125,7 +152,9 @@ router.put('/:id', async (req, res) => {
     }
 
     // Delete old splits and re-insert
-    await client.query('DELETE FROM expense_splits WHERE expense_id = $1', [req.params.id]);
+    await client.query('DELETE FROM expense_splits WHERE expense_id = $1', [
+      req.params.id,
+    ]);
 
     if (split_type === 'exact' && splits) {
       for (const s of splits) {
@@ -135,8 +164,9 @@ router.put('/:id', async (req, res) => {
         );
       }
     } else if (splits) {
-      const participants = splits.map(s => s.user_id);
-      const splitAmount = Math.round((amount / participants.length) * 100) / 100;
+      const participants = splits.map((s) => s.user_id);
+      const splitAmount =
+        Math.round((amount / participants.length) * 100) / 100;
       for (const userId of participants) {
         await client.query(
           'INSERT INTO expense_splits (expense_id, user_id, amount) VALUES ($1, $2, $3)',

@@ -9,13 +9,16 @@ export default function Groups() {
   const [loading, setLoading] = useState(true);
 
   const fetchGroups = () => {
-    api.get('/api/groups')
-      .then(res => setGroups(res.data))
+    api
+      .get('/api/groups')
+      .then((res) => setGroups(res.data))
       .catch(console.error)
       .finally(() => setLoading(false));
   };
 
-  useEffect(() => { fetchGroups(); }, []);
+  useEffect(() => {
+    fetchGroups();
+  }, []);
 
   const createGroup = async (e) => {
     e.preventDefault();
@@ -29,7 +32,8 @@ export default function Groups() {
     }
   };
 
-  if (loading) return <div className="p-4 text-center text-gray-500">Loading...</div>;
+  if (loading)
+    return <div className="p-4 text-center text-gray-500">Loading...</div>;
 
   return (
     <div className="p-4 pb-20">
@@ -44,29 +48,41 @@ export default function Groups() {
       </div>
 
       {showCreate && (
-        <form onSubmit={createGroup} className="bg-white rounded-xl p-4 shadow-sm mb-4 flex gap-2">
+        <form
+          onSubmit={createGroup}
+          className="bg-white rounded-xl p-4 shadow-sm mb-4 flex gap-2"
+        >
           <input
             type="text"
             value={name}
-            onChange={e => setName(e.target.value)}
+            onChange={(e) => setName(e.target.value)}
             placeholder="Group name"
             required
             className="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500"
           />
-          <button type="submit" className="bg-teal-600 text-white px-4 py-2 rounded-lg">
+          <button
+            type="submit"
+            className="bg-teal-600 text-white px-4 py-2 rounded-lg"
+          >
             Create
           </button>
-          <button type="button" onClick={() => setShowCreate(false)} className="text-gray-500 px-2">
+          <button
+            type="button"
+            onClick={() => setShowCreate(false)}
+            className="text-gray-500 px-2"
+          >
             Cancel
           </button>
         </form>
       )}
 
       {groups.length === 0 ? (
-        <p className="text-gray-500 text-center py-8">No groups yet. Create one to get started!</p>
+        <p className="text-gray-500 text-center py-8">
+          No groups yet. Create one to get started!
+        </p>
       ) : (
         <div className="space-y-2">
-          {groups.map(g => (
+          {groups.map((g) => (
             <Link
               key={g.id}
               to={`/groups/${g.id}`}
@@ -75,7 +91,9 @@ export default function Groups() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-semibold text-lg">{g.name}</p>
-                  <p className="text-sm text-gray-500">{g.member_count} members</p>
+                  <p className="text-sm text-gray-500">
+                    {g.member_count} members
+                  </p>
                 </div>
                 <span className="text-gray-400">&rsaquo;</span>
               </div>

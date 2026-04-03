@@ -43,7 +43,10 @@ router.post('/', async (req, res) => {
     // Add other members by email (if they exist)
     if (member_emails?.length) {
       for (const email of member_emails) {
-        const userRes = await client.query('SELECT id FROM users WHERE email = $1', [email]);
+        const userRes = await client.query(
+          'SELECT id FROM users WHERE email = $1',
+          [email]
+        );
         if (userRes.rows.length) {
           await client.query(
             'INSERT INTO group_members (group_id, user_id) VALUES ($1, $2) ON CONFLICT DO NOTHING',
@@ -66,8 +69,11 @@ router.post('/', async (req, res) => {
 // Get group detail with members
 router.get('/:id', async (req, res) => {
   try {
-    const groupRes = await pool.query('SELECT * FROM groups WHERE id = $1', [req.params.id]);
-    if (!groupRes.rows.length) return res.status(404).json({ error: 'Group not found' });
+    const groupRes = await pool.query('SELECT * FROM groups WHERE id = $1', [
+      req.params.id,
+    ]);
+    if (!groupRes.rows.length)
+      return res.status(404).json({ error: 'Group not found' });
 
     const membersRes = await pool.query(
       `SELECT u.id, u.name, u.email, u.avatar_url
@@ -87,8 +93,13 @@ router.get('/:id', async (req, res) => {
 router.post('/:id/members', async (req, res) => {
   const { email } = req.body;
   try {
-    const userRes = await pool.query('SELECT id FROM users WHERE email = $1', [email]);
-    if (!userRes.rows.length) return res.status(404).json({ error: 'User not found. They need to sign up first.' });
+    const userRes = await pool.query('SELECT id FROM users WHERE email = $1', [
+      email,
+    ]);
+    if (!userRes.rows.length)
+      return res
+        .status(404)
+        .json({ error: 'User not found. They need to sign up first.' });
 
     await pool.query(
       'INSERT INTO group_members (group_id, user_id) VALUES ($1, $2) ON CONFLICT DO NOTHING',

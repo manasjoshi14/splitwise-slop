@@ -22,11 +22,16 @@ export default function Navbar() {
         {user && (
           <div className="flex items-center gap-3">
             <img
-              src={user.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}`}
+              src={
+                user.avatar_url ||
+                `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}`
+              }
               alt={user.name}
               className="w-8 h-8 rounded-full"
             />
-            <span className="text-sm text-gray-600 hidden sm:inline">{user.name}</span>
+            <span className="text-sm text-gray-600 hidden sm:inline">
+              {user.name}
+            </span>
             <button
               onClick={logout}
               className="text-sm text-gray-500 hover:text-gray-700"
@@ -40,7 +45,7 @@ export default function Navbar() {
       {/* Bottom tab bar */}
       <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50">
         <div className="max-w-lg mx-auto flex justify-around">
-          {tabs.map(tab => (
+          {tabs.map((tab) => (
             <Link
               key={tab.path}
               to={tab.path}

@@ -5,7 +5,9 @@ export default function Login() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="text-center p-8">
         <h1 className="text-4xl font-bold text-teal-600 mb-2">SplitSlop</h1>
-        <p className="text-gray-600 mb-8">Split expenses with friends, the easy way.</p>
+        <p className="text-gray-600 mb-8">
+          Split expenses with friends, the easy way.
+        </p>
         <a
           href={`${apiUrl}/auth/google`}
           className="inline-flex items-center gap-3 bg-white border border-gray-300 rounded-lg px-6 py-3 text-gray-700 font-medium shadow-sm hover:shadow-md transition-shadow no-underline"

@@ -37,15 +37,26 @@ passport.use(
 
 router.get(
   '/google',
-  passport.authenticate('google', { scope: ['profile', 'email'], session: false })
+  passport.authenticate('google', {
+    scope: ['profile', 'email'],
+    session: false,
+  })
 );
 
 router.get(
   '/google/callback',
-  passport.authenticate('google', { session: false, failureRedirect: '/login' }),
+  passport.authenticate('google', {
+    session: false,
+    failureRedirect: '/login',
+  }),
   (req, res) => {
     const token = jwt.sign(
-      { id: req.user.id, email: req.user.email, name: req.user.name, avatar_url: req.user.avatar_url },
+      {
+        id: req.user.id,
+        email: req.user.email,
+        name: req.user.name,
+        avatar_url: req.user.avatar_url,
+      },
       process.env.JWT_SECRET,
       { expiresIn: '30d' }
     );
@@ -55,7 +66,10 @@ router.get(
 
 router.get('/me', require('../middleware/auth'), async (req, res) => {
   try {
-    const { rows } = await pool.query('SELECT id, email, name, avatar_url FROM users WHERE id = $1', [req.user.id]);
+    const { rows } = await pool.query(
+      'SELECT id, email, name, avatar_url FROM users WHERE id = $1',
+      [req.user.id]
+    );
     if (!rows.length) return res.status(404).json({ error: 'User not found' });
     res.json(rows[0]);
   } catch (err) {
