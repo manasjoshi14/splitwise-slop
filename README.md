@@ -356,29 +356,15 @@ All API routes require a valid JWT in the `Authorization: Bearer <token>` header
 
 ## Deployment
 
-### 1. Database (Neon)
+See **[DEPLOYMENT.md](DEPLOYMENT.md)** for the full step-by-step deployment guide covering Neon, Render, Vercel, and Google OAuth setup.
 
-- Create a free project at [neon.tech](https://neon.tech)
-- Copy the connection string for `DATABASE_URL`
-- Run migrations: `DATABASE_URL=<your-url> npm run migrate`
+Quick summary:
 
-### 2. Backend (Render)
-
-- Create a new Web Service from your GitHub repo
-- Set root directory to `server`
-- Build command: `npm install`
-- Start command: `npm start`
-- Add environment variables: `DATABASE_URL`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `JWT_SECRET`, `CLIENT_URL`
-
-### 3. Frontend (Vercel)
-
-- Import your GitHub repo
-- Set root directory to `client`
-- Add environment variable: `VITE_API_URL` = your Render backend URL
-
-### 4. Google OAuth
-
-- Add your Render backend URL + `/auth/google/callback` as an authorized redirect URI in Google Cloud Console
+1. **Neon** — Create a free PostgreSQL database and run migrations
+2. **Google OAuth** — Create OAuth credentials in Google Cloud Console
+3. **Render** — Deploy the backend with environment variables
+4. **Vercel** — Deploy the frontend with `VITE_API_URL` pointing to Render
+5. **Wire together** — Set `CLIENT_URL` on Render and add the OAuth redirect URI in Google
 
 ---
 
